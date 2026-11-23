@@ -1,0 +1,74 @@
+# =============================================================================
+# IoTGuard - Docker Build Exclusions (.dockerignore)
+# =============================================================================
+
+# Version control
+.git/
+.gitignore
+
+# Dependencies & Node artifacts
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs & compile caches
+dist/
+frontend/dist/
+*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Test runners & coverage reports
+.pytest_cache/
+**/.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Sensitive data, credentials & environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+secrets.*
+credentials.*
+
+# Local editor & operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Temporary files & session notes
+*.log
+logs/
+temp/
+tmp/
+UPLOAD_BUNDLE_NOTE.txt
+
+# Preserve essential runtime datasets and static public assets
+!backend/data/
+!frontend/public/
