@@ -138,5 +138,5 @@ IoTGuard is deployed on Render using Docker, with the FastAPI backend serving th
 - Dashboard visualizations should not be interpreted as real-time monitoring of physical IoT devices.
 - Model performance in experiments does not guarantee equivalent real-world performance.
 ---
-                                        IoTGuard — Making IoT Security Experiments Easier to Explore
+                        IoTGuard — Making IoT Security Experiments Easier to Explore
  
