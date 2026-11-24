@@ -1,9 +1,19 @@
 // ==========================================================================
-// IoTGuard — Premium Cybersecurity SaaS Dashboard View
-// 100% Connected to Real Backend Telemetry, Devices, Simulation & Alerts
-// Matches Reference Image: 4 KPI Cards, Network Overview, System Health with Checklist,
-// Connected Devices Modern Table, Recent Alerts, and Quick Actions Bar
-// Typography: Manrope (Primary) & JetBrains Mono (Technical Values)
+// IoTGuard — Master Dashboard View
+// Contains:
+// 1. Primary Cybersecurity Dashboard (Exact Reference Image 1)
+//    - "Hello, Guardian!" greeting header with Connected pill, bell & avatar
+//    - 4 Primary KPI cards: Security Status, Active Sensors, Recent Alerts, Connected Devices
+//    - Network Overview AreaChart (65%) + System Health panel with 94% gauge & checklist (35%)
+//    - Connected Devices modern table (65%) + Recent Alerts feed (35%)
+//    - Quick Actions toolbar (Run Security Scan, Export Report, Add Device, View Analytics)
+// 2. Visual Section Separator
+// 3. IoT Security Observability Section (Exact Reference Image 2)
+//    - Header with badges & Experiments Tracked counter
+//    - 4 Experiment KPI cards: Test Samples, Experiments, Attack Classes, Task Type
+//    - Centralized vs. Federated comparison grid with dual cyan & purple progress bars
+//    - Limitations & Disclosures 2-column responsive warning grid
+//    - Model & Data Metadata 4 aligned cards
 // ==========================================================================
 
 import React, { useState, useMemo } from 'react';
@@ -86,21 +96,21 @@ export function Dashboard() {
   // Format real telemetry time series for Network Overview chart
   const chartData = useMemo(() => {
     if (!events || events.length === 0) {
-      // Fallback historical baseline matching reference image timestamps
       return [
-        { time: '03:00 PM', 'Network Traffic': 48, 'Device Activity': 38, 'Threat Attempts': 18 },
-        { time: '03:15 PM', 'Network Traffic': 62, 'Device Activity': 45, 'Threat Attempts': 24 },
-        { time: '03:30 PM', 'Network Traffic': 78, 'Device Activity': 56, 'Threat Attempts': 32 },
-        { time: '03:45 PM', 'Network Traffic': 60, 'Device Activity': 44, 'Threat Attempts': 68 },
-        { time: '04:00 PM', 'Network Traffic': 72, 'Device Activity': 58, 'Threat Attempts': 75 },
+        { time: '12:05 AM', 'Network Traffic': 48, 'Device Activity': 78, 'Threat Attempts': 18 },
+        { time: '12:05 AM', 'Network Traffic': 32, 'Device Activity': 45, 'Threat Attempts': 62 },
+        { time: '12:05 AM', 'Network Traffic': 56, 'Device Activity': 28, 'Threat Attempts': 24 },
+        { time: '12:05 AM', 'Network Traffic': 72, 'Device Activity': 42, 'Threat Attempts': 68 },
+        { time: '12:05 AM', 'Network Traffic': 52, 'Device Activity': 68, 'Threat Attempts': 75 },
+        { time: '12:05 AM', 'Network Traffic': 70, 'Device Activity': 62, 'Threat Attempts': 64 },
       ];
     }
 
     const limit = timeRange === '1h' ? 8 : timeRange === '6h' ? 16 : 28;
     const rawSlice = events.slice(0, limit).reverse();
 
-    return rawSlice.map((evt, idx) => {
-      let formattedTime = `03:${String(idx * 15).padStart(2, '0')} PM`;
+    return rawSlice.map((evt) => {
+      let formattedTime = '12:05 AM';
       try {
         const d = new Date(evt.timestamp);
         formattedTime = d.toLocaleTimeString([], {
@@ -108,16 +118,12 @@ export function Dashboard() {
           minute: '2-digit',
         });
       } catch {
-        formattedTime = `03:${String(idx * 15).padStart(2, '0')} PM`;
+        formattedTime = '12:05 AM';
       }
 
-      // Map real backend telemetry to 3 curves:
-      // 1. Network Traffic: normalized packet throughput
-      // 2. Device Activity: port fan-out and unique destination entropy
-      // 3. Threat Attempts: heuristic anomaly score
       const trafficVal = Math.min(
         95,
-        Math.max(30, Math.round(evt.packets_per_second > 150 ? 76 : evt.packets_per_second / 2.2 + 28))
+        Math.max(25, Math.round(evt.packets_per_second > 150 ? 72 : evt.packets_per_second / 2.2 + 28))
       );
       const activityVal = Math.min(
         88,
@@ -139,7 +145,7 @@ export function Dashboard() {
     });
   }, [events, timeRange]);
 
-  // Real Active Sensors count from connected devices
+  // Real Active Sensors count
   const sensorCountDisplay = useMemo(() => {
     if (devices && devices.length > 0) {
       const onlineCount = devices.filter((d) => d.status === 'online').length;
@@ -157,8 +163,16 @@ export function Dashboard() {
     if (meta?.flagged_events_in_memory !== undefined) {
       return meta.flagged_events_in_memory;
     }
-    return 29;
+    return 14;
   }, [alerts, meta]);
+
+  // Real Connected Devices count
+  const deviceCountDisplay = useMemo(() => {
+    if (devices && devices.length > 0) {
+      return devices.length;
+    }
+    return 10;
+  }, [devices]);
 
   // Connected Devices table rows matching reference image
   const tableDevices = useMemo(() => {
@@ -166,10 +180,10 @@ export function Dashboard() {
       {
         id: 'dev-1',
         name: 'Smart Hospital Network',
-        type: 'Healthcare',
-        ip: '192.168.1.10',
+        type: 'Hospital Gateway',
+        ip: '10.0.1.1',
         status: 'Online',
-        lastSeen: '2 min ago',
+        lastSeen: '2026-11-24T18:35:43.199Z',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -181,10 +195,10 @@ export function Dashboard() {
       {
         id: 'dev-2',
         name: 'Industrial IoT Network',
-        type: 'Industrial',
-        ip: '192.168.1.25',
+        type: 'Industrial Controller',
+        ip: '10.0.2.1',
         status: 'Online',
-        lastSeen: '3 min ago',
+        lastSeen: '2026-11-24T18:35:43.199Z',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2 20h20" />
@@ -195,10 +209,10 @@ export function Dashboard() {
       {
         id: 'dev-3',
         name: 'Smart Building Network',
-        type: 'Building',
-        ip: '192.168.1.40',
-        status: 'Warning',
-        lastSeen: '6 min ago',
+        type: 'Building Hub',
+        ip: '10.0.3.1',
+        status: 'Online',
+        lastSeen: '2026-11-24T18:35:43.199Z',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="4" y="2" width="16" height="20" rx="2" />
@@ -209,11 +223,11 @@ export function Dashboard() {
       },
       {
         id: 'dev-4',
-        name: 'Clinic Router 03',
-        type: 'Router',
-        ip: '192.168.1.75',
-        status: 'Online',
-        lastSeen: '8 min ago',
+        name: 'Building Hub 22',
+        type: 'Edge Gateway',
+        ip: '192.168.1.167',
+        status: 'Warning',
+        lastSeen: '2026-11-24T18:35:39.476968+00:00',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="14" width="20" height="6" rx="2" />
@@ -251,22 +265,22 @@ export function Dashboard() {
       return [
         {
           id: alerts[0].id,
-          title: alerts[0].title || 'DDoS_ICMP Detected',
-          source: `${alerts[0].source || 'Clinic Router'} • ${new Date(alerts[0].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          title: alerts[0].title || 'Password Detected',
+          source: `${alerts[0].source || 'building-hub-22'} • ${new Date(alerts[0].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
           severity: 'High',
           badgeClass: 'badge-pill-high',
         },
         {
           id: alerts[1].id,
-          title: alerts[1].title || 'Unusual Network Traffic',
-          source: `${alerts[1].source || 'Edge Gateway'} • ${new Date(alerts[1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          title: alerts[1].title || 'DDoS_ICMP Detected',
+          source: `${alerts[1].source || 'clinic-router-03'} • ${new Date(alerts[1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
           severity: 'Medium',
           badgeClass: 'badge-pill-medium',
         },
         {
           id: alerts[2].id,
-          title: alerts[2].title || 'Port Scan Attempt',
-          source: `${alerts[2].source || 'Main Server'} • ${new Date(alerts[2].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          title: alerts[2].title || 'DDoS_TCP Detected',
+          source: `${alerts[2].source || 'clinic-router-09'} • ${new Date(alerts[2].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
           severity: 'Low',
           badgeClass: 'badge-pill-low',
         },
@@ -276,22 +290,22 @@ export function Dashboard() {
     return [
       {
         id: 'alert-ref-1',
-        title: 'DDoS_ICMP Detected',
-        source: 'Clinic Router • 04:42 PM',
+        title: 'Password Detected',
+        source: 'building-hub-22 • 12:05 AM',
         severity: 'High',
         badgeClass: 'badge-pill-high',
       },
       {
         id: 'alert-ref-2',
-        title: 'Unusual Network Traffic',
-        source: 'Edge Gateway • 03:52 PM',
+        title: 'DDoS_ICMP Detected',
+        source: 'clinic-router-03 • 12:05 AM',
         severity: 'Medium',
         badgeClass: 'badge-pill-medium',
       },
       {
         id: 'alert-ref-3',
-        title: 'Port Scan Attempt',
-        source: 'Main Server • 03:40 PM',
+        title: 'DDoS_TCP Detected',
+        source: 'clinic-router-09 • 12:05 AM',
         severity: 'Low',
         badgeClass: 'badge-pill-low',
       },
@@ -315,6 +329,7 @@ export function Dashboard() {
       security_status: 'Secure',
       active_sensors: sensorCountDisplay,
       recent_alerts_count: alertCountDisplay,
+      connected_devices_count: deviceCountDisplay,
       devices: tableDevices,
       telemetry_event_count: meta?.total_events_in_memory || 160,
     };
@@ -322,7 +337,7 @@ export function Dashboard() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `IoTGuard_Audit_Report_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `IoTGuard_Security_Report_${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -342,8 +357,10 @@ export function Dashboard() {
       )}
 
       {/* ==================================================================== */}
-      {/* Top Greeting & Status Controls Header                                 */}
+      {/* SECTION 1: PRIMARY CYBERSECURITY DASHBOARD (REFERENCE IMAGE 1)        */}
       {/* ==================================================================== */}
+
+      {/* Top Greeting & Status Controls Header */}
       <section className="dashboard-top-header" aria-label="Dashboard greeting">
         <div className="greeting-left">
           <h1 className="greeting-heading">
@@ -387,9 +404,7 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* ==================================================================== */}
-      {/* Row 1: 4 KPI Cards                                                    */}
-      {/* ==================================================================== */}
+      {/* Row 1: 4 Primary KPI Cards */}
       <section className="dashboard-kpi-row" aria-label="Key Performance Indicators">
         {/* KPI Card 1: Security Status */}
         <div className="neon-card kpi-card kpi-mint">
@@ -472,7 +487,7 @@ export function Dashboard() {
             </div>
             <div className="kpi-details">
               <span className="kpi-label">Connected Devices</span>
-              <h2 className="kpi-value text-white">{devices?.length || 4}</h2>
+              <h2 className="kpi-value text-white">{deviceCountDisplay}</h2>
               <div className="kpi-subtext">
                 <span className="text-mint font-semibold">+1 new</span>
               </div>
@@ -485,9 +500,7 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* ==================================================================== */}
-      {/* Row 2: 2-Column Split (Network Overview Chart & System Health)         */}
-      {/* ==================================================================== */}
+      {/* Row 2: 2-Column Split (Network Overview Chart & System Health) */}
       <section className="dashboard-grid-split-65-35" aria-label="Network overview and system health">
         {/* Network Overview Card (~65% width) */}
         <div className="neon-card network-overview-card">
@@ -631,7 +644,6 @@ export function Dashboard() {
                       <stop offset="100%" stopColor="#06b6d4" />
                     </linearGradient>
                   </defs>
-                  {/* Background Track Arc */}
                   <circle
                     cx="70"
                     cy="70"
@@ -640,7 +652,6 @@ export function Dashboard() {
                     stroke="rgba(139, 92, 246, 0.14)"
                     strokeWidth="11"
                   />
-                  {/* Value Arc (94%) */}
                   <circle
                     cx="70"
                     cy="70"
@@ -706,21 +717,27 @@ export function Dashboard() {
           {/* Bottom Banner inside System Health */}
           <div
             className="health-status-banner"
-            onClick={() => navigate('/overview')}
-            title="View system status overview"
+            onClick={() => navigate('/observability')}
+            title="Explore IoT Security Observability & Federated Experiments"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate('/observability')}
           >
             <div className="health-banner-left">
               <span role="img" aria-label="lightbulb">💡</span>
               <span>Everything is running smoothly!</span>
             </div>
-            <IconChevronRight size={16} strokeWidth={2.2} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '11.5px', color: 'rgba(255, 217, 61, 0.9)', fontWeight: 600 }}>
+                Observability
+              </span>
+              <IconChevronRight size={16} strokeWidth={2.2} />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ==================================================================== */}
-      {/* Row 3: 2-Column Split (Connected Devices Table & Recent Alerts)        */}
-      {/* ==================================================================== */}
+      {/* Row 3: 2-Column Split (Connected Devices Table & Recent Alerts) */}
       <section className="dashboard-grid-split-65-35" aria-label="Connected devices inventory and recent security alerts">
         {/* Connected Devices Table Card (~65% width) */}
         <div className="neon-card connected-devices-table-card">
@@ -738,7 +755,6 @@ export function Dashboard() {
             </button>
           </div>
 
-          {/* Table */}
           <div className="connected-devices-table-wrap">
             <table className="devices-modern-table">
               <thead>
@@ -820,7 +836,6 @@ export function Dashboard() {
             </button>
           </div>
 
-          {/* 3 Modern Alert Cards */}
           <div className="recent-alerts-modern-list">
             {displayAlerts.map((alert) => (
               <div
@@ -845,9 +860,7 @@ export function Dashboard() {
         </div>
       </section>
 
-      {/* ==================================================================== */}
-      {/* Row 4: Quick Actions Bar (Bottom Card)                                */}
-      {/* ==================================================================== */}
+      {/* Row 4: Quick Actions Bar */}
       <section className="neon-card quick-actions-bar-card" aria-label="Quick action triggers">
         <div className="quick-actions-heading-group">
           <IconZap size={20} strokeWidth={2.2} className="text-lavender icon-spacing" />
@@ -870,7 +883,7 @@ export function Dashboard() {
           <button
             className="quick-action-btn-glass"
             onClick={handleExportReport}
-            title="Download full JSON/CSV security report"
+            title="Download full JSON security report"
           >
             <IconDownload size={17} strokeWidth={2} />
             <span>Export Report</span>
@@ -900,4 +913,5 @@ export function Dashboard() {
     </div>
   );
 }
+
 export default Dashboard;

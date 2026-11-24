@@ -9,6 +9,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSecurityAlerts, useStream } from '../api';
 import {
   IconDashboard,
+  IconActivity,
   IconSensor,
   IconAlertTriangle,
   IconMonitor,
@@ -57,6 +58,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: IconDashboard },
+    { id: 'observability', label: 'Observability', icon: IconActivity },
     { id: 'sensors', label: 'Sensors', icon: IconSensor },
     { id: 'alerts', label: 'Alerts', icon: IconAlertTriangle, badge: unacknowledgedAlertCount },
     { id: 'devices', label: 'Devices', icon: IconMonitor },
@@ -146,7 +148,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <nav className="sidebar-nav" aria-label="Dashboard sections">
           {navItems.map((item) => {
             const isActive =
-              currentView === item.id || (item.id === 'dashboard' && currentView === '');
+              currentView === item.id ||
+              (item.id === 'dashboard' && currentView === '') ||
+              (item.id === 'observability' && currentView === 'overview');
             const Icon = item.icon;
 
             return (

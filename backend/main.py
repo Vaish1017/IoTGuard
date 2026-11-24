@@ -340,10 +340,13 @@ if FRONTEND_DIST.is_dir():
 
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str):
-        """Serve SPA index.html for all non-API, non-asset routes."""
-        # Let API routes through (they're already registered above)
-        # Let asset requests through (mounted above)
-        # For everything else, serve index.html
+        """Serve static files from FRONTEND_DIST, or index.html for SPA routes."""
+        # 1. Serve root static assets (favicon.ico, PNG icons, brand-mark.svg, etc.)
+        candidate = FRONTEND_DIST / full_path
+        if full_path and candidate.is_file():
+            return FileResponse(candidate)
+
+        # 2. Serve index.html for all client-side SPA routing fallback
         index_file = FRONTEND_DIST / "index.html"
         if index_file.exists():
             return FileResponse(index_file, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})

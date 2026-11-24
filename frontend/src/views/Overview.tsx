@@ -73,7 +73,7 @@ const COMPARISON_METRICS: MetricItem[] = [
   },
 ];
 
-export function Overview() {
+export function Overview({ embedded }: { embedded?: boolean } = {}) {
   const { data, loading, error } = useOverview();
 
   const kpiItems = [

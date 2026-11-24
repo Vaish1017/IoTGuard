@@ -17,6 +17,7 @@ import { Devices } from './views/Devices';
 import { Analytics } from './views/Analytics';
 import { Settings } from './views/Settings';
 import { Overview } from './views/Overview';
+import { Observability } from './views/Observability';
 import { Experiments } from './views/Experiments';
 import { Classes } from './views/Classes';
 import { Simulation } from './views/Simulation';
@@ -85,9 +86,10 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Overview />} />
-          <Route path="dashboard" element={<Overview />} />
-          <Route path="overview" element={<Overview />} />
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="observability" element={<Observability />} />
+          <Route path="overview" element={<Observability />} />
           <Route path="cyber-dashboard" element={<Dashboard />} />
           <Route path="sensors" element={<Sensors />} />
           <Route path="alerts" element={<Alerts />} />
