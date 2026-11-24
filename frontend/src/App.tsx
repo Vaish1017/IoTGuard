@@ -85,14 +85,15 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route index element={<Overview />} />
+          <Route path="dashboard" element={<Overview />} />
+          <Route path="overview" element={<Overview />} />
+          <Route path="cyber-dashboard" element={<Dashboard />} />
           <Route path="sensors" element={<Sensors />} />
           <Route path="alerts" element={<Alerts />} />
           <Route path="devices" element={<Devices />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="overview" element={<Overview />} />
           <Route path="experiments" element={<Experiments />} />
           <Route path="classes" element={<Classes />} />
           <Route path="simulation" element={<Simulation />} />

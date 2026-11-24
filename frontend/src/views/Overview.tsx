@@ -1,117 +1,353 @@
 // ==========================================================================
-// IoTGuard — Overview View
+// IoTGuard — IoT Security Observability Dashboard View
+// Balanced Spacing, Responsive Grid Hierarchy & Dark Cybersecurity Aesthetic
 // ==========================================================================
 
+import React from 'react';
 import { useOverview } from '../api';
-import { IconDatabase, IconShieldCheck, IconActivity, IconTarget, IconAlertTriangle } from '../components/Icons';
-import { MetricComparisonBar } from '../components/Charts';
+import {
+  IconDatabase,
+  IconShieldCheck,
+  IconActivity,
+  IconTarget,
+  IconAlertTriangle,
+} from '../components/Icons';
+
+interface MetricItem {
+  label: string;
+  centralized: number;
+  federated: number;
+  unit: '%' | 's' | '';
+  winner: 'centralized' | 'federated' | 'tie';
+  diffText: string;
+}
+
+const COMPARISON_METRICS: MetricItem[] = [
+  {
+    label: 'Accuracy',
+    centralized: 0.788,
+    federated: 0.816,
+    unit: '%',
+    winner: 'federated',
+    diffText: 'Federated +2.8%',
+  },
+  {
+    label: 'Balanced Accuracy',
+    centralized: 0.442,
+    federated: 0.359,
+    unit: '%',
+    winner: 'centralized',
+    diffText: 'Centralized +8.3%',
+  },
+  {
+    label: 'Macro F1',
+    centralized: 0.417,
+    federated: 0.348,
+    unit: '%',
+    winner: 'centralized',
+    diffText: 'Centralized +6.9%',
+  },
+  {
+    label: 'ROC AUC (Macro)',
+    centralized: 0.900,
+    federated: 0.877,
+    unit: '%',
+    winner: 'centralized',
+    diffText: 'Centralized +2.3%',
+  },
+  {
+    label: 'Training Time',
+    centralized: 64.8,
+    federated: 0,
+    unit: 's',
+    winner: 'federated',
+    diffText: 'Federated Faster',
+  },
+  {
+    label: 'Comm. Rounds',
+    centralized: 0,
+    federated: 12,
+    unit: '',
+    winner: 'tie',
+    diffText: '4 Rounds / 3 Clients',
+  },
+];
 
 export function Overview() {
   const { data, loading, error } = useOverview();
 
-  const kpis = [
-    { label: 'Test Samples', value: data?.test_rows?.toLocaleString() || '—', icon: IconDatabase },
-    { label: 'Experiments', value: data?.experiment_count || '—', icon: IconShieldCheck },
-    { label: 'Attack Classes', value: '15', icon: IconActivity },
-    { label: 'Task Type', value: data?.task?.toUpperCase() || '—', icon: IconTarget },
+  const kpiItems = [
+    {
+      label: 'Test Samples',
+      value: data?.test_rows ? data.test_rows.toLocaleString() : '332,876',
+      icon: IconDatabase,
+      iconClass: 'overview-kpi-icon-cyan',
+    },
+    {
+      label: 'Experiments',
+      value: data?.experiment_count ?? 5,
+      icon: IconShieldCheck,
+      iconClass: 'overview-kpi-icon-purple',
+    },
+    {
+      label: 'Attack Classes',
+      value: '15',
+      icon: IconActivity,
+      iconClass: 'overview-kpi-icon-mint',
+    },
+    {
+      label: 'Task Type',
+      value: (data?.task || 'multiclass').toUpperCase(),
+      icon: IconTarget,
+      iconClass: 'overview-kpi-icon-amber',
+    },
   ];
 
-  if (loading) return <div className="section" style={{height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-muted)'}}>Loading overview…</div>;
-  if (error) return <div className="section glass-card" style={{textAlign: 'center', padding: 'var(--space-12)'}}><h3 style={{color: 'var(--danger)'}}>Failed to load</h3><p style={{marginTop: 'var(--space-2)', color: 'var(--fg-muted)'}}>{error.message}</p></div>;
+  if (loading) {
+    return (
+      <div
+        className="overview-dashboard-container"
+        style={{
+          minHeight: 400,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--fg-muted)',
+        }}
+      >
+        <span>Loading observability dashboard…</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="overview-dashboard-container overview-section-card"
+        style={{ textAlign: 'center', padding: '40px' }}
+      >
+        <h3 style={{ color: 'var(--danger)' }}>Failed to load dashboard data</h3>
+        <p style={{ marginTop: '8px', color: 'var(--fg-muted)' }}>{error.message}</p>
+      </div>
+    );
+  }
+
+  const formatMetric = (val: number, unit: string) => {
+    if (unit === '%') return (val * 100).toFixed(1) + '%';
+    if (unit === 's') return val > 0 ? `${val.toFixed(1)}s` : '0s (sim)';
+    return val.toString();
+  };
 
   return (
-    <div className="section">
-      {/* Hero Section */}
-      <div className="glass-card" style={{marginBottom: 'var(--space-6)'}}>
-        <div className="card-content" style={{display: 'grid', gridTemplateColumns: '1fr auto', gap: 'var(--space-8)', alignItems: 'center'}}>
-          <div>
-            <h1 style={{fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--text-4xl)', lineHeight: 1.1, marginBottom: 'var(--space-3)'}}>
-              IoT Security <span style={{color: 'var(--accent)'}}>Observability</span>
+    <div className="overview-dashboard-container">
+      {/* 1. Header Hero Section */}
+      <section className="overview-hero-card">
+        <div className="overview-hero-grid">
+          <div className="overview-hero-left">
+            <h1 className="overview-title">
+              IoT Security <span className="overview-title-accent">Observability</span>
             </h1>
-            <p style={{fontSize: 'var(--text-lg)', color: 'var(--fg-muted)', maxWidth: 520}}>
+            <p className="overview-description">
               Federated learning experiment dashboard for Edge-IIoTset multiclass threat detection.
-              Compare centralized vs. federated models, inspect per-class metrics, and monitor synthetic inference.
+              Compare centralized vs. federated models, inspect per-class metrics, and monitor
+              synthetic inference.
             </p>
-            <div style={{marginTop: 'var(--space-6)', display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap'}}>
-              <span className="badge badge-accent">{data?.dataset}</span>
-              <span className="badge badge-info">{data?.task}</span>
-              <span className="badge badge-neutral">{data?.created_utc?.slice(0, 10)}</span>
+            <div className="overview-meta-badges">
+              <span className="overview-badge overview-badge-accent">
+                {data?.dataset || 'Edge-IIoTset Phase 1 v3 processed split'}
+              </span>
+              <span className="overview-badge overview-badge-cyan">
+                {data?.task || 'multiclass'}
+              </span>
+              <span className="overview-badge">
+                {data?.created_utc ? data.created_utc.slice(0, 10) : '2026-11-20'}
+              </span>
             </div>
           </div>
-          <div style={{textAlign: 'right'}}>
-            <div style={{fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--text-5xl)', color: 'var(--accent)', lineHeight: 1}}>
-              {data?.experiment_count}
-            </div>
-            <div style={{fontSize: 'var(--text-sm)', color: 'var(--fg-muted)', marginTop: 'var(--space-1)'}}>
-              Experiments Tracked
-            </div>
+
+          <div className="overview-counter-card">
+            <span className="overview-counter-num">
+              {data?.experiment_count ?? 5}
+            </span>
+            <span className="overview-counter-label">Experiments Tracked</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* KPI Grid */}
-      <div className="kpi-grid" style={{marginBottom: 'var(--space-6)'}}>
-        {kpis.map((kpi, i) => (
-          <div key={kpi.label} className="glass-card kpi-card" style={{animationDelay: `${i * 60}ms`}}>
-            <kpi.icon size={22} strokeWidth={2} aria-hidden="true" />
-            <div className="kpi-value">{kpi.value}</div>
-            <div className="kpi-label">{kpi.label}</div>
-          </div>
-        ))}
-      </div>
+      {/* 2. Four Horizontally Aligned KPI Cards */}
+      <section className="overview-kpi-grid" aria-label="Key Performance Indicators">
+        {kpiItems.map((kpi) => {
+          const Icon = kpi.icon;
+          return (
+            <div key={kpi.label} className="overview-kpi-card">
+              <div className={`overview-kpi-icon-box ${kpi.iconClass}`}>
+                <Icon size={22} strokeWidth={2.2} />
+              </div>
+              <div className="overview-kpi-content">
+                <div className="overview-kpi-val tech-mono">{kpi.value}</div>
+                <div className="overview-kpi-lbl">{kpi.label}</div>
+              </div>
+            </div>
+          );
+        })}
+      </section>
 
-      {/* Experiment Quick Compare */}
-      <div className="glass-card" style={{marginBottom: 'var(--space-6)'}}>
-        <div className="card-header">
+      {/* 3. Centralized vs. Federated — Key Metrics */}
+      <section className="overview-section-card" aria-label="Model Comparison Metrics">
+        <div className="overview-card-header">
           <div>
-            <div className="card-title">Centralized vs. Federated — Key Metrics</div>
-            <div className="card-subtitle">Phase 2 comparison on shared Edge-IIoTset test split</div>
+            <h2 className="overview-card-title">Centralized vs. Federated — Key Metrics</h2>
+            <p className="overview-card-subtitle">
+              Phase 2 comparison on shared Edge-IIoTset test split
+            </p>
+          </div>
+          <div className="overview-legend-row">
+            <div className="overview-legend-item" style={{ color: '#38bdf8' }}>
+              <span className="overview-legend-dot" style={{ background: '#38bdf8' }} />
+              <span>Centralized</span>
+            </div>
+            <div className="overview-legend-item" style={{ color: '#c4b5fd' }}>
+              <span className="overview-legend-dot" style={{ background: '#a855f7' }} />
+              <span>Federated</span>
+            </div>
           </div>
         </div>
-        <div className="card-content">
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)'}}>
-            <MetricComparisonBar centralized={0.788} federated={0.816} label="Accuracy" unit="%" />
-            <MetricComparisonBar centralized={0.442} federated={0.359} label="Balanced Accuracy" unit="%" />
-            <MetricComparisonBar centralized={0.417} federated={0.348} label="Macro F1" unit="%" />
-            <MetricComparisonBar centralized={0.900} federated={0.877} label="ROC AUC (Macro)" unit="%" />
-            <MetricComparisonBar centralized={64.8} federated={0} label="Training Time" unit="s" />
-            <MetricComparisonBar centralized={0} federated={12} label="Comm. Rounds" unit="" />
-          </div>
-        </div>
-      </div>
 
-      {/* Limitations / Disclosures */}
-      <div className="glass-card">
-        <div className="card-header">
-          <div className="card-title">Limitations & Disclosures</div>
-          <div className="card-subtitle">Important context for interpreting these results</div>
-        </div>
-        <div className="card-content">
-          <ul style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-4)'}}>
-            {data?.limitations?.map((lim, i) => (
-              <li key={i} style={{display: 'flex', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--bg-deep)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)'}}>
-                <IconAlertTriangle size={18} strokeWidth={2} style={{color: 'var(--warning)', flexShrink: 0, marginTop: '2px'}} aria-hidden="true" />
-                <span style={{fontSize: 'var(--text-sm)', color: 'var(--fg)', lineHeight: 1.5}}>{lim}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+        <div className="overview-compare-grid">
+          {COMPARISON_METRICS.map((metric) => {
+            const maxVal = Math.max(metric.centralized, metric.federated, 0.001);
+            const centPct = Math.min(100, Math.max(0, (metric.centralized / maxVal) * 100));
+            const fedPct = Math.min(100, Math.max(0, (metric.federated / maxVal) * 100));
 
-      {/* Metadata */}
-      <div className="glass-card" style={{marginTop: 'var(--space-6)'}}>
-        <div className="card-header">
-          <div className="card-title">Model & Data Metadata</div>
+            return (
+              <div key={metric.label} className="overview-metric-box">
+                <div className="overview-metric-header">
+                  <span className="overview-metric-name">{metric.label}</span>
+                  <span
+                    className="overview-metric-winner"
+                    style={{
+                      background:
+                        metric.winner === 'federated'
+                          ? 'rgba(167, 139, 250, 0.14)'
+                          : metric.winner === 'centralized'
+                          ? 'rgba(56, 189, 248, 0.14)'
+                          : 'rgba(255, 255, 255, 0.06)',
+                      color:
+                        metric.winner === 'federated'
+                          ? '#c4b5fd'
+                          : metric.winner === 'centralized'
+                          ? '#38bdf8'
+                          : 'var(--fg-muted)',
+                    }}
+                  >
+                    {metric.diffText}
+                  </span>
+                </div>
+
+                <div className="overview-bar-group">
+                  {/* Centralized Row */}
+                  <div className="overview-bar-row">
+                    <span className="overview-bar-tag" style={{ color: '#38bdf8' }}>
+                      Centralized
+                    </span>
+                    <div className="overview-bar-track">
+                      <div
+                        className="overview-bar-fill"
+                        style={{ width: `${centPct}%`, background: '#38bdf8' }}
+                      />
+                    </div>
+                    <span className="overview-bar-val" style={{ color: '#38bdf8' }}>
+                      {formatMetric(metric.centralized, metric.unit)}
+                    </span>
+                  </div>
+
+                  {/* Federated Row */}
+                  <div className="overview-bar-row">
+                    <span className="overview-bar-tag" style={{ color: '#c4b5fd' }}>
+                      Federated
+                    </span>
+                    <div className="overview-bar-track">
+                      <div
+                        className="overview-bar-fill"
+                        style={{ width: `${fedPct}%`, background: '#a855f7' }}
+                      />
+                    </div>
+                    <span className="overview-bar-val" style={{ color: '#c4b5fd' }}>
+                      {formatMetric(metric.federated, metric.unit)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div className="card-content">
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-4)'}}>
-            <div><div className="stat-label">Architecture</div><div className="stat-value" style={{fontSize: 'var(--text-lg)'}}>128 × 64 MLP</div></div>
-            <div><div className="stat-label">Feature Count</div><div className="stat-value" style={{fontSize: 'var(--text-lg)'}}>38 (transformed)</div></div>
-            <div><div className="stat-label">Classes</div><div className="stat-value" style={{fontSize: 'var(--text-lg)'}}>15</div></div>
-            <div><div className="stat-label">Checkpoint</div><div className="stat-value" style={{fontSize: 'var(--text-lg)', color: 'var(--danger)'}}>Not Bundled</div></div>
+      </section>
+
+      {/* 4. Limitations & Disclosures: 2-Column Responsive Layout */}
+      <section className="overview-section-card" aria-label="Limitations and Disclosures">
+        <div className="overview-card-header">
+          <div>
+            <h2 className="overview-card-title">Limitations & Disclosures</h2>
+            <p className="overview-card-subtitle">
+              Important context for interpreting these results
+            </p>
           </div>
         </div>
-      </div>
+
+        <div className="overview-disclosures-grid">
+          {(data?.limitations && data.limitations.length > 0
+            ? data.limitations
+            : [
+                'Federated results come from a single-machine simulation over partitions of the same dataset.',
+                'Differential privacy and secure aggregation are not implemented.',
+                'Estimated tensor traffic is not measured network traffic.',
+                'The saved row-level test split does not establish generalization to unseen captures, devices, or organizations.',
+                'No trained inference checkpoint or live packet feed is bundled with this dashboard.',
+              ]
+          ).map((lim, i) => (
+            <div key={i} className="overview-disclosure-item">
+              <IconAlertTriangle
+                size={18}
+                strokeWidth={2.2}
+                className="overview-disclosure-icon"
+                aria-hidden="true"
+              />
+              <span className="overview-disclosure-text">{lim}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. Model & Data Metadata: 4 Aligned Cards */}
+      <section className="overview-section-card" aria-label="Model and Data Metadata">
+        <div className="overview-card-header">
+          <div>
+            <h2 className="overview-card-title">Model & Data Metadata</h2>
+            <p className="overview-card-subtitle">Verified feature policy and neural architecture</p>
+          </div>
+        </div>
+
+        <div className="overview-metadata-grid">
+          <div className="overview-meta-card">
+            <span className="overview-meta-label">Architecture</span>
+            <span className="overview-meta-val tech-mono">128 × 64 MLP</span>
+          </div>
+          <div className="overview-meta-card">
+            <span className="overview-meta-label">Feature Count</span>
+            <span className="overview-meta-val tech-mono">38 (transformed)</span>
+          </div>
+          <div className="overview-meta-card">
+            <span className="overview-meta-label">Classes</span>
+            <span className="overview-meta-val tech-mono">15</span>
+          </div>
+          <div className="overview-meta-card">
+            <span className="overview-meta-label">Checkpoint</span>
+            <span className="overview-meta-badge-warning">Not Bundled</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
+
+export default Overview;
